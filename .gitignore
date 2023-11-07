@@ -1,0 +1,7 @@
+*.mat
+*.ply
+*.h5
+*.pth
+logfile.txt
+*.zip
+*.off
