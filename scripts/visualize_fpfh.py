@@ -59,7 +59,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize FPFH features on a point cloud.")
     parser.add_argument("file_path", help="Path to the PLY file")
     parser.add_argument("--feature_index", type=int, default=0, help="Index of the FPFH feature to visualize")
-    parser.add_argument("--radius", type=float, default=0.1, help="Radius for FPFH")
+    # Set the default radii as half of the diameter of the NDI sphere
+    parser.add_argument("--radius_normal", type=float, default=0.5, help="Radius for FPFH")
+    parser.add_argument("--radius_fpfh", type=float, default=0.5, help="Radius for FPFH")
 
     args = parser.parse_args()
 
@@ -73,12 +75,13 @@ if __name__ == "__main__":
 
     # Estimate normals if they don't exist
     if not pcd.has_normals():
-        pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+        pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(
+            radius=args.radius_normal, max_nn=30))
 
     # Compute FPFH features
     fpfh = o3d.pipelines.registration.compute_fpfh_feature(
         pcd,
-        o3d.geometry.KDTreeSearchParamHybrid(radius=args.radius, max_nn=100)
+        o3d.geometry.KDTreeSearchParamHybrid(radius=args.radius_fpfh, max_nn=100)
     )
 
     # Visualize the point cloud colored by the specified FPFH feature
