@@ -22,12 +22,12 @@ def color_point_cloud_by_fpfh(pcd, fpfh, feature_index):
     normalized_fpfh = (fpfh_values - min_values) / (max_values - min_values)
 
     # Apply the colors to the point cloud based on the feature importance
-    cmap = plt.get_cmap("inferno")
+    cmap = plt.get_cmap("jet")
     colors = cmap(normalized_fpfh[:, feature_index])[:, :3]  # Take only RGB, not alpha
     pcd.colors = o3d.utility.Vector3dVector(colors)
 
     # Create a coordinate frame (axis)
-    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=5.0, origin=[0, 0, 0])
+    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0, origin=[0, 0, 0])
 
     # Define the rotation angle around the Z-axis (180 degrees clockwise)
     angle_z = np.pi  # 180 degrees in radians
@@ -59,7 +59,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize FPFH features on a point cloud.")
     parser.add_argument("file_path", help="Path to the PLY file")
     parser.add_argument("--feature_index", type=int, default=0, help="Index of the FPFH feature to visualize")
-    
+    parser.add_argument("--radius", type=float, default=0.1, help="Radius for FPFH")
+
     args = parser.parse_args()
 
     # Ensure the PLY file exists
@@ -75,10 +76,9 @@ if __name__ == "__main__":
         pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
 
     # Compute FPFH features
-    radius_feature = 0.1
     fpfh = o3d.pipelines.registration.compute_fpfh_feature(
         pcd,
-        o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100)
+        o3d.geometry.KDTreeSearchParamHybrid(radius=args.radius, max_nn=100)
     )
 
     # Visualize the point cloud colored by the specified FPFH feature
