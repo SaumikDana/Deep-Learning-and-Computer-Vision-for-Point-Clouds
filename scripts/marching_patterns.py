@@ -69,4 +69,4 @@ for i, img in enumerate(patterns_applied):
     cv2.putText(collage_image_bgr, label, label_pos, font, font_scale, font_color, font_thickness)
 
 # Save the collage image
-cv2.imwrite('Scan_patterns_collage_labeled.png', collage_image_bgr)
+cv2.imwrite('Scan_marching_patterns_collage_labeled.png', collage_image_bgr)

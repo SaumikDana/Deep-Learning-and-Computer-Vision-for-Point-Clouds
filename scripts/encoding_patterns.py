@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load the Lenna image
-lenna_img = cv2.imread('Lenna.png', cv2.IMREAD_GRAYSCALE)
+lenna_img = cv2.imread('Scan.png', cv2.IMREAD_GRAYSCALE)
 if lenna_img is None:
     raise ValueError("Image not found or path is incorrect")
 
@@ -86,4 +86,4 @@ for i, img in enumerate(patterns_applied):
     cv2.putText(collage_image, label, label_pos, font, font_scale, font_color, font_thickness)
 
 # Save the collage image
-cv2.imwrite('lenna_patterns_collage_labeled.png', collage_image_bgr)
+cv2.imwrite('Scan_encoding_patterns_collage_labeled.png', collage_image_bgr)
