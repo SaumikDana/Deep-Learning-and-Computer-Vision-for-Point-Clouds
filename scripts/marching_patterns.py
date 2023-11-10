@@ -12,61 +12,50 @@ def create_sinusoidal_pattern(width, height, phase_shift):
     y = np.arange(height)
     X, Y = np.meshgrid(x, y)
 
-    # Sinusoidal pattern generation
-    frequency = 2 * np.pi / 20  # Adjust frequency as needed
+    # Sinusoidal pattern generation with increased frequency
+    frequency = 2 * np.pi / 100 
     pattern = np.sin(frequency * X + phase_shift)
     pattern_normalized = ((pattern - pattern.min()) / (pattern.max() - pattern.min()) * 255).astype(np.uint8)
     return pattern_normalized
 
 # Number of patterns with different phase shifts
-num_patterns = 8
+num_patterns = 14
 
-# Generate and apply phase-shifted patterns
-patterns_applied = []
+# Generate an array of phase shifts evenly spaced between 0 and 2*pi
 phase_steps = np.linspace(0, 2 * np.pi, num_patterns, endpoint=False)
 
-for phase_shift in phase_steps:
+# Offset for each subsequent image
+offset_x, offset_y = 30, 30  # Adjust as needed
+
+# Scale factor for each image
+scale_factor = 0.05  # Reduce the size of each image
+
+# Calculate the size of the final composite image
+scaled_width = int(lenna_img.shape[1] * scale_factor)
+scaled_height = int(lenna_img.shape[0] * scale_factor)
+final_width = scaled_width + offset_x * (num_patterns - 1)
+final_height = scaled_height + offset_y * (num_patterns - 1)
+
+# Create a transparent composite image (RGBA)
+composite_image = np.zeros((final_height, final_width, 4), dtype=np.uint8)
+
+# Place each pattern-applied image in the composite image
+for i, phase_shift in enumerate(phase_steps):
     pattern = create_sinusoidal_pattern(lenna_img.shape[1], lenna_img.shape[0], phase_shift)
-    applied_pattern = cv2.bitwise_and(lenna_img, pattern)
-    patterns_applied.append(applied_pattern)
+    pattern_enhanced = cv2.equalizeHist(pattern)
+    applied_pattern = cv2.bitwise_and(lenna_img, pattern_enhanced)
 
-# Define spacing between images
-spacing = 10  # pixels
+    # Scale down the image
+    scaled_image = cv2.resize(applied_pattern, (scaled_width, scaled_height))
 
-# Determine the size of the collage with spacing
-num_images = len(patterns_applied)
-collage_rows = int(np.sqrt(num_images))
-collage_cols = int(np.ceil(num_images / collage_rows))
+    start_x = i * offset_x
+    start_y = i * offset_y
+    end_x = start_x + scaled_width
+    end_y = start_y + scaled_height
 
-# Create a blank collage image with spacing
-background_color = 127  # Medium gray
-collage_height = collage_rows * (lenna_img.shape[0] + spacing) - spacing
-collage_width = collage_cols * (lenna_img.shape[1] + spacing) - spacing
-collage_image = np.full((collage_height, collage_width), background_color, dtype=np.uint8)
+    # Place the scaled image in the composite image and set the alpha channel to opaque for this region
+    composite_image[start_y:end_y, start_x:end_x, :3] = cv2.cvtColor(scaled_image, cv2.COLOR_GRAY2BGR)
+    composite_image[start_y:end_y, start_x:end_x, 3] = 255  # Alpha channel set to opaque
 
-# Define font for the label
-font = cv2.FONT_HERSHEY_SIMPLEX
-font_scale = 0.5
-font_color = (255, 255, 255)
-font_thickness = 1
-
-# Convert the grayscale collage to a BGR image for labeling
-collage_image_bgr = cv2.cvtColor(collage_image, cv2.COLOR_GRAY2BGR)
-
-# Place each pattern-applied image into the collage image with spacing and label it
-for i, img in enumerate(patterns_applied):
-    row = i // collage_cols
-    col = i % collage_cols
-    start_row = row * (lenna_img.shape[0] + spacing)
-    start_col = col * (lenna_img.shape[1] + spacing)
-    
-    # Insert the image with spacing
-    collage_image_bgr[start_row:start_row+lenna_img.shape[0], start_col:start_col+lenna_img.shape[1]] = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-    # Label the image
-    label = f'Phase {i+1}'
-    label_pos = (start_col + 5, start_row + lenna_img.shape[0] - 5)
-    cv2.putText(collage_image_bgr, label, label_pos, font, font_scale, font_color, font_thickness)
-
-# Save the collage image
-cv2.imwrite('Scan_marching_patterns_collage_labeled.png', collage_image_bgr)
+# Save the final composite image
+cv2.imwrite('Scan_marching_patterns_collage_labeled.png', composite_image)
