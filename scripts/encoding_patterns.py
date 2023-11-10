@@ -34,7 +34,7 @@ for num_bands in patterns:
         patterns_applied.append(inverse_pattern)
 
 # Define spacing between images
-spacing = 10  # pixels
+spacing = 100  # pixels
 
 # Determine the size of the collage with spacing
 num_images = len(patterns_applied)
@@ -74,11 +74,11 @@ for i, img in enumerate(patterns_applied):
     img_bgr = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     collage_image_bgr[start_row:start_row+lenna_img.shape[0], start_col:start_col+lenna_img.shape[1]] = img_bgr
 
-    # Draw a diagonal red strikethrough line for the 4th and 5th images
-    if i in set1: 
-        line_start = (start_col, start_row)
-        line_end = (start_col + lenna_img.shape[1], start_row + lenna_img.shape[0])
-        cv2.line(collage_image_bgr, line_start, line_end, (0, 0, 255), thickness=5)  # Red line
+    # # Draw a diagonal red strikethrough line for the 4th and 5th images
+    # if i in set1: 
+    #     line_start = (start_col, start_row)
+    #     line_end = (start_col + lenna_img.shape[1], start_row + lenna_img.shape[0])
+    #     cv2.line(collage_image_bgr, line_start, line_end, (0, 0, 255), thickness=5)  # Red line
     
     # Label the image
     label = f'Pattern {i+1}' if i % 2 == 0 else f'Inv {i}'
