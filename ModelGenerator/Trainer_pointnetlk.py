@@ -75,10 +75,12 @@ class Trainer:
         """
         Sets up the device for training (CPU or GPU).
         """
-        if not torch.cuda.is_available():
-            self.args.device = 'cpu'
-        else:
+        if torch.backends.mps.is_available():
+            self.args.device = 'mps'
+        elif torch.cuda.is_available():
             self.args.device = 'cuda'
+        else:
+            self.args.device = 'cpu'
             
         self.args.device = torch.device(self.args.device)
         print(f"Running on: {self.args.device}")

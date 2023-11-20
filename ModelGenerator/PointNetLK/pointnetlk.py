@@ -1,6 +1,3 @@
-""" PointLK ver. 2018.07.06.
-    using approximated Jacobian by backward-difference.
-"""
 import torch
 from . import se3, invmat
 

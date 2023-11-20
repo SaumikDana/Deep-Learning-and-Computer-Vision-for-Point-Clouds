@@ -1,10 +1,3 @@
-""" PointNet
-    References.
-        .. [1] Charles R. Qi, Hao Su, Kaichun Mo and Leonidas J. Guibas,
-        "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation",
-        CVPR (2017)
-"""
-
 import torch
 
 def symfn_max(x):
