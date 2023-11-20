@@ -7,10 +7,6 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torchvision.transforms import ToPILImage
 
-# Additional imports
-import numpy as np
-import matplotlib.pyplot as plt
-
 # Check for GPU availability
 # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -70,110 +66,6 @@ def evaluate_model(model, loader):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
     return 100 * correct / total
-
-# # Evaluate on the original test set
-# original_accuracy = evaluate_model(model, testloader)
-
-# # Function to evaluate rotation accuracy
-# def evaluate_rotation_accuracy(model, angle):
-#     rotate = transforms.Compose([
-#         transforms.RandomRotation(degrees=angle),
-#         transforms.ToTensor(),
-#         transforms.Normalize((0.5,), (0.5,))
-#     ])
-#     rotated_testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=rotate)
-#     rotated_loader = DataLoader(rotated_testset, batch_size=64, shuffle=False)
-#     return evaluate_model(model, rotated_loader)
-
-# # Function to evaluate translation accuracy
-# def evaluate_translation_accuracy(model, translate_percent):
-#     translate = transforms.Compose([
-#         transforms.RandomAffine(degrees=0, translate=(translate_percent, translate_percent)),
-#         transforms.ToTensor(),
-#         transforms.Normalize((0.5,), (0.5,))
-#     ])
-#     translated_testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=translate)
-#     translated_loader = DataLoader(translated_testset, batch_size=64, shuffle=False)
-#     return evaluate_model(model, translated_loader)
-
-# # Collecting accuracies for different rotation angles
-# angles = range(0, 90, 15)
-# rotation_accuracies = []
-
-# for angle in angles:
-#     acc = evaluate_rotation_accuracy(model, angle)
-#     rotation_accuracies.append(acc)
-#     print(f'Rotation Angle: {angle}, Accuracy: {acc}%')
-
-# # Collecting accuracies for different translation percentages
-# translation_percents = [i * 0.01 for i in range(12)]  # 0%, 2%, ..., 20%
-# translation_accuracies = []
-
-# for translate_percent in translation_percents:
-#     acc = evaluate_translation_accuracy(model, translate_percent)
-#     translation_accuracies.append(acc)
-#     print(f'Translation: {translate_percent*100}%, Accuracy: {acc}%')
-
-# # Plotting rotation accuracy vs angle
-# plt.figure(figsize=(12, 6))
-# plt.subplot(1, 2, 1)
-# plt.plot(angles, rotation_accuracies, marker='o')
-# plt.title('Rotation Accuracy vs Angle')
-# plt.xlabel('Rotation Angle (Degrees)')
-# plt.ylabel('Accuracy (%)')
-# plt.grid(True)
-
-# # Plotting translation accuracy vs translation percentage
-# plt.subplot(1, 2, 2)
-# plt.plot([p*100 for p in translation_percents], translation_accuracies, marker='o')
-# plt.title('Translation Accuracy vs Translation Percentage')
-# plt.xlabel('Translation Percentage (%)')
-# plt.ylabel('Accuracy (%)')
-# plt.grid(True)
-
-# plt.tight_layout()
-# plt.show()
-
-
-# # Select a sample image and its label from the test set
-# sample_image, sample_label = next(iter(testloader))
-# sample_image, sample_label = sample_image[0], sample_label[0]
-# sample_image = sample_image.to(device)
-
-# # Rotate the sample image
-# rotation_degree = 30  # Example rotation degree
-# rotate_transform = transforms.Compose([
-#     transforms.RandomRotation(degrees=rotation_degree),
-#     transforms.ToTensor(),
-#     transforms.Normalize((0.5,), (0.5,))
-# ])
-# rotated_sample_image = rotate_transform(sample_image.cpu()).to(device)
-
-# # Prediction function for a single image
-# def predict_image(model, image):
-#     model.eval()
-#     with torch.no_grad():
-#         outputs = model(image.unsqueeze(0))
-#         _, predicted = torch.max(outputs, 1)
-#     return predicted.item()
-
-# # Predict the digit for original and rotated image
-# original_pred = predict_image(model, sample_image)
-# rotated_pred = predict_image(model, rotated_sample_image)
-
-# # Plotting the original and rotated images with predictions
-# plt.figure(figsize=(8, 4))
-# plt.subplot(1, 2, 1)
-# plt.imshow(sample_image.cpu().squeeze(), cmap='gray')
-# plt.title(f'Original Image\nTrue Label: {sample_label}\nPredicted: {original_pred}')
-# plt.axis('off')
-
-# plt.subplot(1, 2, 2)
-# plt.imshow(rotated_sample_image.cpu().squeeze(), cmap='gray')
-# plt.title(f'Rotated Image\nTrue Label: {sample_label}\nPredicted: {rotated_pred}')
-# plt.axis('off')
-
-# plt.show()
 
 # Evaluate on the original test set
 original_accuracy = evaluate_model(model, testloader)

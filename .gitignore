@@ -5,4 +5,4 @@ logfile.txt
 *.zip
 *.off
 *.ply
-*.gz
+Scripts/data/
