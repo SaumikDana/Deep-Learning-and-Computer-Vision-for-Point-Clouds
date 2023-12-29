@@ -77,26 +77,26 @@ PointNetLK (PointNet Lucas-Kanade) is an adaptation and combination of the Point
 
 - Input Preparation:
 
-    Point Clouds: Obtain two point clouds, a source and a target, that you want to align.
-    Preprocessing: Preprocess the point clouds if necessary (e.g., downsampling, denoising).
+    - Point Clouds: Obtain two point clouds, a source and a target, that you want to align.
+    - Preprocessing: Preprocess the point clouds if necessary (e.g., downsampling, denoising).
 
 - Feature Extraction with PointNet:
 
-    Source and Target Features: Pass both the source and target point clouds through a PointNet architecture to extract features. PointNet processes each point individually and uses a symmetric function (like max pooling) to ensure invariance to permutations of the points.
-    Feature Representation: Obtain a global feature representation for each point cloud, capturing the distribution of points and their spatial relationships.
+    - Source and Target Features: Pass both the source and target point clouds through a PointNet architecture to extract features. PointNet processes each point individually and uses a symmetric function (like max pooling) to ensure invariance to permutations of the points.
+    - Feature Representation: Obtain a global feature representation for each point cloud, capturing the distribution of points and their spatial relationships.
 
 - Lucas-Kanade Iterative Alignment:
 
-    Initial Parameters: Start with an initial guess of the transformation (e.g., identity if no prior knowledge).
-    Iterative Process:
-        Warping: Apply the current estimate of the transformation to the source point cloud to align it with the target.
-        Error Computation: Compute the difference between the warped source and the target in the feature space provided by PointNet. This difference is an error metric representing how well the two point clouds are aligned.
-        Parameter Update: Use the Lucas-Kanade method to update the transformation parameters to minimize this error. This typically involves solving a linear system where the solution gives the best update to the parameters under the least squares criterion.
+    - Initial Parameters: Start with an initial guess of the transformation (e.g., identity if no prior knowledge).
+    - Iterative Process:
+        - Warping: Apply the current estimate of the transformation to the source point cloud to align it with the target.
+        - Error Computation: Compute the difference between the warped source and the target in the feature space provided by PointNet. This difference is an error metric representing how well the two point clouds are aligned.
+        - Parameter Update: Use the Lucas-Kanade method to update the transformation parameters to minimize this error. This typically involves solving a linear system where the solution gives the best update to the parameters under the least squares criterion.
 
 - Convergence Check:
 
-    Termination Criteria: Check if the transformation parameters have converged (e.g., changes are below a certain threshold) or if a maximum number of iterations has been reached.
-    Output: If converged, return the final transformation parameters that best align the source to the target.
+    - Termination Criteria: Check if the transformation parameters have converged (e.g., changes are below a certain threshold) or if a maximum number of iterations has been reached.
+    - Output: If converged, return the final transformation parameters that best align the source to the target.
 
 - Transformation Application:
 
