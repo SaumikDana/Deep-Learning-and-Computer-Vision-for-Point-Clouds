@@ -73,20 +73,19 @@ DL_CV_Images/
 
 ## PointNetLK based registration
 
-PointNetLK (PointNet Lucas-Kanade) is an adaptation and combination of the PointNet architecture with the Lucas-Kanade algorithm for the task of 3D point cloud registration. PointNet is a deep neural network designed to process point clouds (sets of points in a 3D space), and the Lucas-Kanade method is a classical algorithm for image registration, typically used for aligning images and tracking motion. When adapted for 3D point cloud registration, the goal is to align two sets of 3D points (point clouds) from different perspectives or times.
+PointNetLK (PointNet Lucas-Kanade) is an adaptation and combination of the PointNet architecture with the Lucas-Kanade algorithm for the task of 3D point cloud registration. PointNet is a deep neural network designed to process point clouds (sets of points in a 3D space), and the Lucas-Kanade method is a classical algorithm for image registration, typically used for aligning images and tracking motion. When adapted for 3D point cloud registration, the goal is to align two sets of 3D points (point clouds) from different perspectives or times. Here's an overall algorithmic framework for PointNetLK applied to 3D point cloud registration:
 
-Here's an overall algorithmic framework for PointNetLK applied to 3D point cloud registration:
-1. Input Preparation:
+- Input Preparation:
 
     Point Clouds: Obtain two point clouds, a source and a target, that you want to align.
     Preprocessing: Preprocess the point clouds if necessary (e.g., downsampling, denoising).
 
-2. Feature Extraction with PointNet:
+- Feature Extraction with PointNet:
 
     Source and Target Features: Pass both the source and target point clouds through a PointNet architecture to extract features. PointNet processes each point individually and uses a symmetric function (like max pooling) to ensure invariance to permutations of the points.
     Feature Representation: Obtain a global feature representation for each point cloud, capturing the distribution of points and their spatial relationships.
 
-3. Lucas-Kanade Iterative Alignment:
+- Lucas-Kanade Iterative Alignment:
 
     Initial Parameters: Start with an initial guess of the transformation (e.g., identity if no prior knowledge).
     Iterative Process:
@@ -94,12 +93,12 @@ Here's an overall algorithmic framework for PointNetLK applied to 3D point cloud
         Error Computation: Compute the difference between the warped source and the target in the feature space provided by PointNet. This difference is an error metric representing how well the two point clouds are aligned.
         Parameter Update: Use the Lucas-Kanade method to update the transformation parameters to minimize this error. This typically involves solving a linear system where the solution gives the best update to the parameters under the least squares criterion.
 
-4. Convergence Check:
+- Convergence Check:
 
     Termination Criteria: Check if the transformation parameters have converged (e.g., changes are below a certain threshold) or if a maximum number of iterations has been reached.
     Output: If converged, return the final transformation parameters that best align the source to the target.
 
-5. Transformation Application:
+- Transformation Application:
 
     Apply Final Transformation: Use the final estimated transformation to warp the source point cloud fully into the coordinate system of the target point cloud.
 
