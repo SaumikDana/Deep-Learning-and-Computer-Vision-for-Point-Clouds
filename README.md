@@ -67,6 +67,10 @@ DL_CV_Images/
 └── pyproject.toml - Configuration file for Poetry and project metadata.
 ```
 
+## PointNet architecture
+
+![pointnet](https://github.com/SaumikDana/Deep-Learning-and-Computer-Vision-for-Point-Clouds/assets/9474631/eeb20b61-33b5-498a-a5c8-a5275f4507a7)
+
 ## PointNetLK based registration
 
 ### Generating synthetic data 
