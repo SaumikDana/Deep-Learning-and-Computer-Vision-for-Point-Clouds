@@ -75,31 +75,44 @@ DL_CV_Images/
 
 ```
 Function Lucas_Kanade(I1, I2, window_size):
-    // I1: First image frame
-    // I2: Second image frame
+    // I1: First image frame (at time t)
+    // I2: Second image frame (at time t+1)
     // window_size: Size of the window to consider around each pixel
 
-    Initialize flow_vectors as an empty list or matrix
+    Initialize flow_vectors as an empty list or matrix to store the flow vectors for each pixel
 
+    // Iterate through each pixel in the first image
     For each pixel (x, y) in I1:
-        // Define the window around the pixel
+        // Define a small window around the current pixel in the first image
         W := window centered at (x, y) of size window_size in I1
 
-        // Compute image gradients within the window
+        // Compute the image gradients within the window:
+        // Ix and Iy are the spatial gradients (change of image intensity in x and y directions)
+        // It is the temporal gradient (change of intensity over time, or between frames)
         Ix := gradient of W in the x-direction
         Iy := gradient of W in the y-direction
         It := difference between the window W in I1 and the same window in I2
 
-        // Construct matrices A and b from gradients for least squares
+        // Construct matrices A and b from the gradients for the least squares solution:
+        // A is composed of the gradients Ix and Iy for all points in the window,
+        // representing the change in image intensity for each point in x and y directions.
+        // b is composed of the negative temporal gradient -It for all points,
+        // representing the change in image intensity over time.
         A := [Ix, Iy]  // A 2-column matrix where each row is [Ix_i, Iy_i] for each pixel i in the window
         b := [-It]     // b is a column vector where each element is -It_i for each pixel i in the window
 
-        // Solve for velocity (v_x, v_y) using least squares: A'Av = A'b
+        // Solve for the velocity (v_x, v_y) using the least squares method:
+        // The equation A'Av = A'b arises from minimizing the error between the observed
+        // intensities and the intensities predicted by the flow velocities.
+        // This gives us a 2D vector representing the apparent motion at (x, y)
+        // v_x is the horizontal motion, and v_y is the vertical motion.
         v := Inverse(A' * A) * A' * b
 
-        // Store the computed flow vector
+        // Store the computed flow vector for the current pixel
+        // The flow vector represents the estimated motion of the pixel between the two frames.
         flow_vectors[x, y] := v
 
+    // Return the matrix of flow vectors, representing the estimated motion for each pixel
     Return flow_vectors
 ```
 
