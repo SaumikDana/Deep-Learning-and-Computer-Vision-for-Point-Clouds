@@ -74,46 +74,82 @@ DL_CV_Images/
 ## PointNetLK based registration
 
 ```
-Function Lucas_Kanade(I1, I2, window_size):
-    // I1: First image frame (at time t)
-    // I2: Second image frame (at time t+1)
-    // window_size: Size of the window to consider around each pixel
+Function Lucas_Kanade_Registration(I_fixed, I_moving, transformation_model):
+    // I_fixed: The fixed image that remains constant
+    // I_moving: The moving image that needs to be registered to the fixed image
+    // transformation_model: The model of transformation (e.g., affine, projective)
 
-    Initialize flow_vectors as an empty list or matrix to store the flow vectors for each pixel
+    Initialize parameters for the transformation_model
 
-    // Iterate through each pixel in the first image
-    For each pixel (x, y) in I1:
-        // Define a small window around the current pixel in the first image
-        W := window centered at (x, y) of size window_size in I1
+    // Create image pyramids for a multi-resolution approach
+    pyramid_fixed := Create_Image_Pyramid(I_fixed)
+    pyramid_moving := Create_Image_Pyramid(I_moving)
 
-        // Compute the image gradients within the window:
-        // Ix and Iy are the spatial gradients (change of image intensity in x and y directions)
-        // It is the temporal gradient (change of intensity over time, or between frames)
-        Ix := gradient of W in the x-direction
-        Iy := gradient of W in the y-direction
-        It := difference between the window W in I1 and the same window in I2
+    // Iterate from the coarsest to the finest resolution
+    For level from max_level down to 1:
+        // Warp the moving image at the current level using the current estimate of parameters
+        warped_moving := Warp_Image(pyramid_moving[level], parameters)
 
-        // Construct matrices A and b from the gradients for the least squares solution:
-        // A is composed of the gradients Ix and Iy for all points in the window,
-        // representing the change in image intensity for each point in x and y directions.
-        // b is composed of the negative temporal gradient -It for all points,
-        // representing the change in image intensity over time.
-        A := [Ix, Iy]  // A 2-column matrix where each row is [Ix_i, Iy_i] for each pixel i in the window
-        b := [-It]     // b is a column vector where each element is -It_i for each pixel i in the window
+        // Compute the difference between the fixed image and the warped moving image
+        difference := pyramid_fixed[level] - warped_moving
 
-        // Solve for the velocity (v_x, v_y) using the least squares method:
-        // The equation A'Av = A'b arises from minimizing the error between the observed
-        // intensities and the intensities predicted by the flow velocities.
-        // This gives us a 2D vector representing the apparent motion at (x, y)
-        // v_x is the horizontal motion, and v_y is the vertical motion.
-        v := Inverse(A' * A) * A' * b
+        // Use Lucas-Kanade to estimate the parameters that minimize this difference
+        // Update the parameters based on the estimated motion
+        parameters := Update_Parameters_Lucas_Kanade(difference, parameters, level)
 
-        // Store the computed flow vector for the current pixel
-        // The flow vector represents the estimated motion of the pixel between the two frames.
-        flow_vectors[x, y] := v
+    // After all levels are processed, the parameters should align the moving image to the fixed image
+    Return Warp_Image(I_moving, parameters)
 
-    // Return the matrix of flow vectors, representing the estimated motion for each pixel
-    Return flow_vectors
+Function Create_Image_Pyramid(I, max_levels):
+    // I: Input image
+    // max_levels: Number of pyramid levels to create
+
+    Initialize pyramid as an empty list
+    current_level_image := I
+
+    // Generate each level of the pyramid by repeatedly smoothing and downsampling the image
+    For level from 1 to max_levels:
+        pyramid.append(current_level_image)
+        current_level_image := Downsample(Smooth(current_level_image))
+
+    Return pyramid
+
+Function Warp_Image(I, parameters):
+    // I: Image to be warped
+    // parameters: Parameters of the transformation model
+
+    // Apply the transformation to each pixel in the image according to the parameters
+    // This could be a complex operation depending on the transformation model
+    Return transformed_image
+
+Function Update_Parameters_Lucas_Kanade(difference, parameters, level):
+    // difference: Difference between the fixed image and the warped moving image
+    // parameters: Current estimate of the parameters
+    // level: Current level of the pyramid
+
+    // Calculate the gradient of the difference image
+    gradient := Calculate_Gradient(difference)
+
+    // Estimate the motion and update the parameters accordingly
+    // This could involve solving a system of equations or optimization problem
+    delta_parameters := Estimate_Motion(gradient, difference)
+
+    // Update parameters with the estimated change
+    new_parameters := parameters + delta_parameters
+
+    Return new_parameters
+
+Function Estimate_Motion(gradient, difference):
+    // gradient: Gradient of the difference image
+    // difference: Difference between the fixed image and the warped moving image
+
+    // Implement the core of Lucas-Kanade here to estimate the motion
+    // This might involve setting up and solving a least squares problem
+    // The exact implementation will depend on the chosen transformation model
+
+    Return estimated_motion
+
+// Note: Smooth and Downsample functions are assumed to be standard image processing functions.
 ```
 
 ### Generating synthetic data 
