@@ -139,9 +139,9 @@ Function PointNetLK(PointCloud_source, PointCloud_target):
 
 Notes:
 
-    PointNet Architecture: The specific architecture of PointNet can vary based on the version used and the specific task requirements. It typically involves several layers of point-wise MLPs (multi-layer perceptrons), a max pooling layer for feature aggregation, and fully connected layers for further processing.
-    Transformation Model: The choice of transformation model (e.g., rigid, affine) will affect the form of the Apply_Transformation and Update_Parameters_LK functions. For 3D registration, a rigid or affine transformation is commonly used.
-    Convergence Criteria: Common criteria include small changes in the error metric or transformation parameters and reaching a maximum number of iterations.
+    - PointNet Architecture: The specific architecture of PointNet can vary based on the version used and the specific task requirements. It typically involves several layers of point-wise MLPs (multi-layer perceptrons), a max pooling layer for feature aggregation, and fully connected layers for further processing.
+    - Transformation Model: The choice of transformation model (e.g., rigid, affine) will affect the form of the Apply_Transformation and Update_Parameters_LK functions. For 3D registration, a rigid or affine transformation is commonly used.
+    - Convergence Criteria: Common criteria include small changes in the error metric or transformation parameters and reaching a maximum number of iterations.
     
 ### Generating synthetic data 
 
