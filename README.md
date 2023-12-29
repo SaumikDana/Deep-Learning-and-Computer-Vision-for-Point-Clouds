@@ -73,6 +73,36 @@ DL_CV_Images/
 
 ## PointNetLK based registration
 
+```
+Function Lucas_Kanade(I1, I2, window_size):
+    // I1: First image frame
+    // I2: Second image frame
+    // window_size: Size of the window to consider around each pixel
+
+    Initialize flow_vectors as an empty list or matrix
+
+    For each pixel (x, y) in I1:
+        // Define the window around the pixel
+        W := window centered at (x, y) of size window_size in I1
+
+        // Compute image gradients within the window
+        Ix := gradient of W in the x-direction
+        Iy := gradient of W in the y-direction
+        It := difference between the window W in I1 and the same window in I2
+
+        // Construct matrices A and b from gradients for least squares
+        A := [Ix, Iy]  // A 2-column matrix where each row is [Ix_i, Iy_i] for each pixel i in the window
+        b := [-It]     // b is a column vector where each element is -It_i for each pixel i in the window
+
+        // Solve for velocity (v_x, v_y) using least squares: A'Av = A'b
+        v := Inverse(A' * A) * A' * b
+
+        // Store the computed flow vector
+        flow_vectors[x, y] := v
+
+    Return flow_vectors
+```
+
 ### Generating synthetic data 
 
 ``python .\Princeton3DMatchDataGenerator\main.py register N # N is the number of point cloud pairs with corresponding grouth tranformation matrices``
