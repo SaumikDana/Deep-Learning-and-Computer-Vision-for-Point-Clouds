@@ -69,9 +69,7 @@ DL_CV_Images/
 
 ## Generating synthetic data for PointNetLK based registration
 
-``python .\Princeton3DMatchDataGenerator\main.py register N``
-
-N -- number of point cloud pairs with corresponding grouth tranformation matrices
+``python .\Princeton3DMatchDataGenerator\main.py register N # N is the number of point cloud pairs with corresponding grouth tranformation matrices``
 
 ### Training the PointNetLk on synthetic data
 
