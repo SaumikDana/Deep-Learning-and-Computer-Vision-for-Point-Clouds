@@ -73,85 +73,77 @@ DL_CV_Images/
 
 ## PointNetLK based registration
 
+PointNetLK (PointNet Lucas-Kanade) is an adaptation and combination of the PointNet architecture with the Lucas-Kanade algorithm for the task of 3D point cloud registration. PointNet is a deep neural network designed to process point clouds (sets of points in a 3D space), and the Lucas-Kanade method is a classical algorithm for image registration, typically used for aligning images and tracking motion. When adapted for 3D point cloud registration, the goal is to align two sets of 3D points (point clouds) from different perspectives or times.
+
+Here's an overall algorithmic framework for PointNetLK applied to 3D point cloud registration:
+1. Input Preparation:
+
+    Point Clouds: Obtain two point clouds, a source and a target, that you want to align.
+    Preprocessing: Preprocess the point clouds if necessary (e.g., downsampling, denoising).
+
+2. Feature Extraction with PointNet:
+
+    Source and Target Features: Pass both the source and target point clouds through a PointNet architecture to extract features. PointNet processes each point individually and uses a symmetric function (like max pooling) to ensure invariance to permutations of the points.
+    Feature Representation: Obtain a global feature representation for each point cloud, capturing the distribution of points and their spatial relationships.
+
+3. Lucas-Kanade Iterative Alignment:
+
+    Initial Parameters: Start with an initial guess of the transformation (e.g., identity if no prior knowledge).
+    Iterative Process:
+        Warping: Apply the current estimate of the transformation to the source point cloud to align it with the target.
+        Error Computation: Compute the difference between the warped source and the target in the feature space provided by PointNet. This difference is an error metric representing how well the two point clouds are aligned.
+        Parameter Update: Use the Lucas-Kanade method to update the transformation parameters to minimize this error. This typically involves solving a linear system where the solution gives the best update to the parameters under the least squares criterion.
+
+4. Convergence Check:
+
+    Termination Criteria: Check if the transformation parameters have converged (e.g., changes are below a certain threshold) or if a maximum number of iterations has been reached.
+    Output: If converged, return the final transformation parameters that best align the source to the target.
+
+5. Transformation Application:
+
+    Apply Final Transformation: Use the final estimated transformation to warp the source point cloud fully into the coordinate system of the target point cloud.
+
 ```
-Function Lucas_Kanade_Registration(I_fixed, I_moving, transformation_model):
-    // I_fixed: The fixed image that remains constant
-    // I_moving: The moving image that needs to be registered to the fixed image
-    // transformation_model: The model of transformation (e.g., affine, projective)
+Function PointNetLK(PointCloud_source, PointCloud_target):
+    // PointCloud_source: The source point cloud to be aligned
+    // PointCloud_target: The target point cloud
 
-    Initialize parameters for the transformation_model
+    // Step 1: Feature Extraction
+    Features_source := PointNet(PointCloud_source)
+    Features_target := PointNet(PointCloud_target)
 
-    // Create image pyramids for a multi-resolution approach
-    pyramid_fixed := Create_Image_Pyramid(I_fixed)
-    pyramid_moving := Create_Image_Pyramid(I_moving)
+    Initialize transformation_parameters to an identity transformation
 
-    // Iterate from the coarsest to the finest resolution
-    For level from max_level down to 1:
-        // Warp the moving image at the current level using the current estimate of parameters
-        warped_moving := Warp_Image(pyramid_moving[level], parameters)
+    // Step 2: Iterative Alignment
+    While not converged and within iteration limits:
+        // Warp the source point cloud with the current estimate of the transformation
+        Warped_PointCloud_source := Apply_Transformation(PointCloud_source, transformation_parameters)
 
-        // Compute the difference between the fixed image and the warped moving image
-        difference := pyramid_fixed[level] - warped_moving
+        // Extract features of the warped source point cloud
+        Features_warped_source := PointNet(Warped_PointCloud_source)
 
-        // Use Lucas-Kanade to estimate the parameters that minimize this difference
-        // Update the parameters based on the estimated motion
-        parameters := Update_Parameters_Lucas_Kanade(difference, parameters, level)
+        // Step 3: Compute the error in feature space
+        Error := Features_target - Features_warped_source
 
-    // After all levels are processed, the parameters should align the moving image to the fixed image
-    Return Warp_Image(I_moving, parameters)
+        // Step 4: Update the transformation parameters using the Lucas-Kanade method
+        transformation_parameters := Update_Parameters_LK(Features_warped_source, Error, transformation_parameters)
 
-Function Create_Image_Pyramid(I, max_levels):
-    // I: Input image
-    // max_levels: Number of pyramid levels to create
+        // Check for convergence
+        If parameters have converged:
+            break
 
-    Initialize pyramid as an empty list
-    current_level_image := I
+    // Step 5: Apply the final transformation to the source point cloud
+    Final_aligned_source := Apply_Transformation(PointCloud_source, transformation_parameters)
 
-    // Generate each level of the pyramid by repeatedly smoothing and downsampling the image
-    For level from 1 to max_levels:
-        pyramid.append(current_level_image)
-        current_level_image := Downsample(Smooth(current_level_image))
-
-    Return pyramid
-
-Function Warp_Image(I, parameters):
-    // I: Image to be warped
-    // parameters: Parameters of the transformation model
-
-    // Apply the transformation to each pixel in the image according to the parameters
-    // This could be a complex operation depending on the transformation model
-    Return transformed_image
-
-Function Update_Parameters_Lucas_Kanade(difference, parameters, level):
-    // difference: Difference between the fixed image and the warped moving image
-    // parameters: Current estimate of the parameters
-    // level: Current level of the pyramid
-
-    // Calculate the gradient of the difference image
-    gradient := Calculate_Gradient(difference)
-
-    // Estimate the motion and update the parameters accordingly
-    // This could involve solving a system of equations or optimization problem
-    delta_parameters := Estimate_Motion(gradient, difference)
-
-    // Update parameters with the estimated change
-    new_parameters := parameters + delta_parameters
-
-    Return new_parameters
-
-Function Estimate_Motion(gradient, difference):
-    // gradient: Gradient of the difference image
-    // difference: Difference between the fixed image and the warped moving image
-
-    // Implement the core of Lucas-Kanade here to estimate the motion
-    // This might involve setting up and solving a least squares problem
-    // The exact implementation will depend on the chosen transformation model
-
-    Return estimated_motion
-
-// Note: Smooth and Downsample functions are assumed to be standard image processing functions.
+    Return Final_aligned_source, transformation_parameters
 ```
 
+Notes:
+
+    PointNet Architecture: The specific architecture of PointNet can vary based on the version used and the specific task requirements. It typically involves several layers of point-wise MLPs (multi-layer perceptrons), a max pooling layer for feature aggregation, and fully connected layers for further processing.
+    Transformation Model: The choice of transformation model (e.g., rigid, affine) will affect the form of the Apply_Transformation and Update_Parameters_LK functions. For 3D registration, a rigid or affine transformation is commonly used.
+    Convergence Criteria: Common criteria include small changes in the error metric or transformation parameters and reaching a maximum number of iterations.
+    
 ### Generating synthetic data 
 
 ``python .\Princeton3DMatchDataGenerator\main.py register N # N is the number of point cloud pairs with corresponding grouth tranformation matrices``
