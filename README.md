@@ -67,17 +67,19 @@ DL_CV_Images/
 └── pyproject.toml - Configuration file for Poetry and project metadata.
 ```
 
-## Generating synthetic data for PointNetLK based registration
+## PointNetLK based registration
+
+### Generating synthetic data 
 
 ``python .\Princeton3DMatchDataGenerator\main.py register N # N is the number of point cloud pairs with corresponding grouth tranformation matrices``
 
-### Training the PointNetLk on synthetic data
+### Training the PointNetLK on synthetic data
 
 ``python .\ModelGenerator\train_pointnetlk.py --h5-file .\output\output_data.h5 --outfile output --num-points 1024 --epochs 100 --batch-size 1`` 
 
-## Generating synthetic data for PointNet based segmentation
+## PointNet based segmentation
 
-``python .\Stanford3DSemanticDataGenerator\main.py extract N``
+### Generating synthetic data
 
-N -- number of point clouds with corresponding labels
+``python .\Stanford3DSemanticDataGenerator\main.py extract N # N -- number of point clouds with corresponding labels``
 
